@@ -10,7 +10,6 @@ export class ProductsController {
   constructor(private readonly getAllProductsService: GetAllProductsService) {}
 
   @Get()
-  @Get()
   @ApiOperation({
     summary: 'Busca todos os produtos com paginação, ordenação e filtro',
   })

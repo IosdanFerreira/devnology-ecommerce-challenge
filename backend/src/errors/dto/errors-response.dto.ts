@@ -1,4 +1,4 @@
-import { ApiProperty, getSchemaPath } from '@nestjs/swagger';
+import { ApiProperty } from '@nestjs/swagger';
 
 export class ErrorStructureDto {
   @ApiProperty()
@@ -21,10 +21,7 @@ export class ErrorResponseDto {
   @ApiProperty({
     required: false,
     nullable: true,
-    oneOf: [
-      { type: 'array', items: { $ref: getSchemaPath(ErrorStructureDto) } },
-      { type: 'null' },
-    ],
+    type: [ErrorStructureDto],
   })
   erros?: ErrorStructureDto[] | null;
 

@@ -1,13 +1,13 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { RegisterOrderDto } from './dto/register-order.dto';
+import { RegisterOrderInputDto } from './dto/register-order-input.dto';
 import { BaseResponse } from 'src/utils/baseResponse.utils';
 
 @Injectable()
 export class RegisterOrderService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async execute(input: RegisterOrderDto) {
+  async execute(input: RegisterOrderInputDto) {
     const order = await this.prisma.order.create({
       data: {
         customer: input.customer,

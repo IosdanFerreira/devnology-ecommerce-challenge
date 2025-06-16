@@ -1,3 +1,4 @@
+import { ApiProperty } from '@nestjs/swagger';
 import { PaymentMethod, Status } from '@prisma/client';
 import {
   IsString,
@@ -10,15 +11,19 @@ import {
   IsDateString,
   Matches,
 } from 'class-validator';
+import { OrderedProductDto } from 'src/modules/product/dto/ordered-product.dto';
 
-export class RegisterOrderDto {
+export class RegisterOrderInputDto {
+  @ApiProperty()
   @IsString({ message: 'customer deve ser uma string' })
   @IsNotEmpty({ message: 'O nome do cliente deve ser informado' })
   customer: string;
 
+  @ApiProperty()
   @IsEmail({}, { message: 'email deve ser um email valido' })
   email: string;
 
+  @ApiProperty()
   @IsString({ message: 'phone deve ser uma string' })
   @IsNotEmpty({ message: 'O número de telefone do cliente deve ser informado' })
   @Matches(/^\(\d{2}\)\s\d{5}-\d{4}$/, {
@@ -26,22 +31,26 @@ export class RegisterOrderDto {
   })
   phone: string;
 
+  @ApiProperty()
   @IsString({ message: 'address deve ser uma string' })
   @IsNotEmpty({ message: 'O endereço do cliente deve ser informado' })
   address: string;
 
+  @ApiProperty({ type: [OrderedProductDto] })
   @IsArray({ message: 'products deve ser um array' })
   @IsNotEmpty({
     message: 'Pelo menos um produto deve ser adicionado ao pedido',
   })
   products: any[];
 
+  @ApiProperty()
   @IsNumber({}, { message: 'totalAmount deve ser um number' })
   @IsNotEmpty({
     message: 'O valor total do pedido deve ser informado',
   })
   totalAmount: number;
 
+  @ApiProperty()
   @IsEnum(Status, { message: 'O status do pedido deve ser do tipo Status' })
   @IsOptional()
   status?: Status;
@@ -51,14 +60,17 @@ export class RegisterOrderDto {
   })
   paymentMethod: PaymentMethod;
 
+  @ApiProperty()
   @IsEnum(Status, { message: 'O status do pedido deve ser do tipo Status' })
   @IsOptional()
   paymentStatus?: Status; // default pending
 
+  @ApiProperty()
   @IsString({ message: 'paymentId deve ser uma string' })
   @IsOptional()
   paymentId?: string;
 
+  @ApiProperty()
   @IsDateString({}, { message: 'paymentDate deve ser uma data' })
   @IsOptional()
   paymentDate?: string;
