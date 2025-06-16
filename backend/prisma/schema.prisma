@@ -8,15 +8,26 @@ datasource db {
 }
 
 model Order {
-  id          Int      @id @default(autoincrement())
+  id          Int         @id @default(autoincrement())
   customer    String
   email       String
   phone       String?
   address     String?
   products    Json
   totalAmount Float
-  status      String   @default("pending")
-  createdAt   DateTime @default(now())
+  status      OrderStatus @default(pending)
+  createdAt   DateTime    @default(now())
 
   @@map("orders")
+}
+
+enum OrderStatus {
+  pending
+  processing
+  shipped
+  delivered
+  cancelled
+  refunded
+  failed
+  returned
 }
