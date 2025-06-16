@@ -1,11 +1,35 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
+import { RegisterOrderDto } from './dto/register-order.dto';
+import { BaseResponse } from 'src/utils/baseResponse.utils';
 
 @Injectable()
 export class RegisterOrderService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async execute() {
-    return 'register order';
+  async execute(input: RegisterOrderDto) {
+    const order = await this.prisma.order.create({
+      data: {
+        customer: input.customer,
+        email: input.email,
+        phone: input.phone,
+        address: input.address,
+        products: input.products,
+        totalAmount: input.totalAmount,
+        status: 'pending',
+        paymentMethod: input.paymentMethod,
+        paymentStatus: input.paymentStatus ?? 'pending',
+        paymentId: input.paymentId,
+        paymentDate: input.paymentDate
+          ? new Date(input.paymentDate)
+          : undefined,
+      },
+    });
+
+    return BaseResponse.success({
+      statusCode: 201,
+      message: 'Pedido registrado com sucesso',
+      data: order,
+    });
   }
 }

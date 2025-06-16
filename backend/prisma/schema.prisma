@@ -8,20 +8,25 @@ datasource db {
 }
 
 model Order {
-  id          Int         @id @default(autoincrement())
+  id          Int      @id @default(autoincrement())
   customer    String
   email       String
-  phone       String?
-  address     String?
+  phone       String
+  address     String
   products    Json
   totalAmount Float
-  status      OrderStatus @default(pending)
-  createdAt   DateTime    @default(now())
+  status      Status   @default(pending)
+  createdAt   DateTime @default(now())
+
+  paymentMethod PaymentMethod
+  paymentStatus Status        @default(pending)
+  paymentId     String?
+  paymentDate   DateTime?
 
   @@map("orders")
 }
 
-enum OrderStatus {
+enum Status {
   pending
   processing
   shipped
@@ -30,4 +35,10 @@ enum OrderStatus {
   refunded
   failed
   returned
+}
+
+enum PaymentMethod {
+  creditCard
+  boleto
+  pix
 }
