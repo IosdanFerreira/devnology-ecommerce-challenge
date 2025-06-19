@@ -23,4 +23,7 @@ export class GetAllProductsQueryDto {
   @IsOptional()
   @IsString()
   filter?: string;
+
+  @IsOptional()
+  hasDiscount?: boolean;
 }

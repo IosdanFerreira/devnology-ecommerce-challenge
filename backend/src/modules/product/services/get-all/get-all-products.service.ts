@@ -2,19 +2,20 @@ import { Injectable } from '@nestjs/common';
 import { suppliers } from 'src/constants/suppliersUrl';
 import { SortDirection } from 'src/interfaces/meta.interface';
 import { BaseResponse } from 'src/utils/baseResponse.utils';
-import { fetchProducts } from 'src/utils/fetchProducts';
+import { fetchAllProducts } from 'src/modules/product/integrations/fetchAllProducts';
 import { GeneratePagination } from 'src/utils/generatePagination.utils';
 
 @Injectable()
 export class GetAllProductsService {
   /**
-   * Retorna uma lista de produtos paginada, com op o de ordenar e filtrar.
+   * Retorna uma lista de produtos paginada, com opção de ordenar e filtrar.
    *
    * @param page - Número da página a ser retornada.
    * @param perPage - Número de produtos por página.
    * @param sort - Nome do campo que será usado para ordenar os dados
    * @param sortDir - Direção da ordenação
    * @param filter - Filtro para busca por nome, descrição, departamento e categoria
+   * @param hasDiscount - Filtro para produtos com desconto
    *
    * @returns Um objeto com as informações de paginação e dados paginados.
    */
@@ -24,35 +25,43 @@ export class GetAllProductsService {
     sort = null,
     sortDir: SortDirection = 'asc',
     filter?: string,
+    hasDiscount?: string | boolean,
   ) {
-    // Busca os produtos de ambos os fornecedores
+    // Busca produtos de fornecedores brasileiros e europeus
     const [brazilianProducts, europeanProducts] = await Promise.all([
-      fetchProducts(suppliers.brazilianSupplierUrl, 'brazilian'),
-      fetchProducts(suppliers.europeanSupplierUrl, 'european'),
+      fetchAllProducts(suppliers.brazilianSupplierUrl, 'brazilian'),
+      fetchAllProducts(suppliers.europeanSupplierUrl, 'european'),
     ]);
 
-    // Combina os produtos
+    // Combina todos os produtos em uma única lista
     const allProducts = [...brazilianProducts, ...europeanProducts];
 
-    // Filtra os produtos, caso tenha um filtro
-    const filteredProducts = filter
-      ? allProducts.filter((product) => {
-          const lowerFilter = filter.toLowerCase();
+    // Converte o filtro de desconto para booleano, se necessário
+    const parsedHasDiscount =
+      typeof hasDiscount === 'string' ? hasDiscount === 'true' : hasDiscount;
 
-          return (
-            (product.name &&
-              product.name.toLowerCase().includes(lowerFilter)) ||
-            (product.description &&
-              product.description.toLowerCase().includes(lowerFilter)) ||
-            (product.department &&
-              product.department.toLowerCase().includes(lowerFilter)) ||
-            (product.category &&
-              product.category.toLowerCase().includes(lowerFilter))
-          );
-        })
-      : allProducts;
+    // Filtra produtos com base no texto e no desconto
+    const filteredProducts = allProducts.filter((product) => {
+      const matchesTextFilter = filter
+        ? (product.name &&
+            product.name.toLowerCase().includes(filter.toLowerCase())) ||
+          (product.description &&
+            product.description.toLowerCase().includes(filter.toLowerCase())) ||
+          (product.department &&
+            product.department.toLowerCase().includes(filter.toLowerCase())) ||
+          (product.category &&
+            product.category.toLowerCase().includes(filter.toLowerCase()))
+        : true;
 
-    // Gera a paginação, ordenação, e retorna os produtos paginados
+      const matchesDiscountFilter =
+        typeof parsedHasDiscount === 'boolean'
+          ? product.hasDiscount === parsedHasDiscount
+          : true;
+
+      return matchesTextFilter && matchesDiscountFilter;
+    });
+
+    // Pagina os produtos filtrados
     const paginatedProducts = GeneratePagination(
       filteredProducts,
       page,
@@ -61,7 +70,7 @@ export class GetAllProductsService {
       sortDir,
     );
 
-    // Retorna a resposta padronizada
+    // Retorna a resposta com os produtos paginados e metadados
     return BaseResponse.success<any>({
       statusCode: 200,
       message: 'Produtos encontrados com sucesso',

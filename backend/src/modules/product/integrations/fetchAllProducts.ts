@@ -1,15 +1,15 @@
 import axios from 'axios';
-import { normalizeProduct } from './normalizeProduct.utils';
-import { replaceBrokenImage } from './replaceBrokenImage';
+import { normalizeProduct } from '../../../utils/normalizeProduct.utils';
+import { replaceBrokenImage } from '../../../utils/replaceBrokenImage';
 
 /**
- * Busca produtos em uma API externa e os normaliza para o padrão da loja.
+ * Busca produtos em uma API externa e os normaliza para o padrão da aplicação.
  *
  * @param url - URL da API a ser buscada.
  * @param origin - Origem dos produtos, que pode ser "brazilian" ou "european".
  * @returns Uma lista de produtos normalizados.
  */
-export async function fetchProducts(
+export async function fetchAllProducts(
   url: string,
   origin: 'brazilian' | 'european',
 ) {
@@ -21,6 +21,7 @@ export async function fetchProducts(
     normalized.gallery = (normalized.gallery || []).map((img) =>
       replaceBrokenImage(img),
     );
+
     return normalized;
   });
 }
