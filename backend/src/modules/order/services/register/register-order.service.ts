@@ -2,14 +2,24 @@ import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { RegisterOrderInputDto } from './dto/register-order-input.dto';
 import { BaseResponse } from 'src/shared/utils/base-response.utils';
+import { NotFoundError } from 'src/shared/errors';
 
 @Injectable()
 export class RegisterOrderService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(private readonly _prisma: PrismaService) {}
 
-  async execute(input: RegisterOrderInputDto) {
-    const order = await this.prisma.order.create({
+  async execute(input: RegisterOrderInputDto, userId: number) {
+    const user = await this._prisma.user.findUnique({
+      where: { id: userId },
+    });
+
+    if (!user) {
+      throw new NotFoundError('Usuário não encontrado');
+    }
+
+    const order = await this._prisma.order.create({
       data: {
+        userId: userId,
         customer: input.customer,
         email: input.email,
         phone: input.phone,

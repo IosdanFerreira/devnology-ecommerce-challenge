@@ -50,11 +50,6 @@ export class RegisterOrderInputDto {
   })
   totalAmount: number;
 
-  @ApiProperty()
-  @IsEnum(Status, { message: 'O status do pedido deve ser do tipo Status' })
-  @IsOptional()
-  status?: Status;
-
   @IsEnum(PaymentMethod, {
     message: 'O método de pagamento deve ser do tipo PaymentMethod',
   })
@@ -63,7 +58,7 @@ export class RegisterOrderInputDto {
   @ApiProperty()
   @IsEnum(Status, { message: 'O status do pedido deve ser do tipo Status' })
   @IsOptional()
-  paymentStatus?: Status; // default pending
+  paymentStatus?: Status;
 
   @ApiProperty()
   @IsString({ message: 'paymentId deve ser uma string' })

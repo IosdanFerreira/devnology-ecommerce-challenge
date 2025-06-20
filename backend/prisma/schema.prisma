@@ -19,6 +19,8 @@ model User {
   created_at      DateTime @default(now())
   updated_at      DateTime @default(now())
 
+  orders Order[]
+
   @@map("users")
 }
 
@@ -37,6 +39,8 @@ model Order {
   paymentStatus Status        @default(pending)
   paymentId     String?
   paymentDate   DateTime?
+  User          User?         @relation(fields: [userId], references: [id])
+  userId        Int?
 
   @@map("orders")
 }
