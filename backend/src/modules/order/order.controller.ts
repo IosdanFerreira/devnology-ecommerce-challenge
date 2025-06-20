@@ -1,9 +1,9 @@
 import { Body, Controller, Post } from '@nestjs/common';
-import { RegisterOrderService } from './register/register-order.service';
-import { RegisterOrderInputDto } from './register/dto/register-order-input.dto';
+import { RegisterOrderService } from './services/register/register-order.service';
+import { RegisterOrderInputDto } from './services/register/dto/register-order-input.dto';
 import { ApiBody, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
-import { RegisterOrderResponseDto } from './register/dto/register-order-response.dto';
-import { ErrorResponseDto } from 'src/errors/dto/errors-response.dto';
+import { RegisterOrderResponseDto } from './services/register/dto/register-order-response.dto';
+import { ErrorResponseDto } from 'src/shared/errors/dto/errors-response.dto';
 
 @ApiTags('Pedidos')
 @Controller('order')

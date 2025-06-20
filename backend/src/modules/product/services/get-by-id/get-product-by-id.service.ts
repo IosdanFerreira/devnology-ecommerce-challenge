@@ -1,8 +1,8 @@
 import { Injectable } from '@nestjs/common';
-import { suppliers } from 'src/constants/suppliersUrl';
-import { NotFoundError } from 'src/errors';
-import { BaseResponse } from 'src/utils/baseResponse.utils';
-import { fetchProductById } from '../../integrations/fetchProductById';
+import { suppliers } from 'src/shared/constants/suppliersUrl';
+import { NotFoundError } from 'src/shared/errors';
+import { BaseResponse } from 'src/shared/utils/base-response.utils';
+import { fetchProductById } from '../../integrations/fetch-product-by-id';
 
 @Injectable()
 export class GetProductByIdService {
@@ -38,8 +38,12 @@ export class GetProductByIdService {
       // Retorna resposta de sucesso com o produto encontrado
       return BaseResponse.success({
         statusCode: 200,
+        success: true,
+        errorType: null,
+        errors: null,
         message: 'Produto encontrado com sucesso',
         data: product,
+        meta: null,
       });
     }
 
@@ -62,8 +66,12 @@ export class GetProductByIdService {
       // Retorna resposta de sucesso com o produto encontrado
       return BaseResponse.success({
         statusCode: 200,
+        success: true,
+        errorType: null,
+        errors: null,
         message: 'Produto encontrado com sucesso',
         data: product,
+        meta: null,
       });
     }
 

@@ -1,12 +1,17 @@
-import { Injectable } from '@nestjs/common';
-import { suppliers } from 'src/constants/suppliersUrl';
-import { SortDirection } from 'src/interfaces/meta.interface';
-import { BaseResponse } from 'src/utils/baseResponse.utils';
-import { fetchAllProducts } from 'src/modules/product/integrations/fetchAllProducts';
-import { GeneratePagination } from 'src/utils/generatePagination.utils';
+import { Inject, Injectable } from '@nestjs/common';
+import { suppliers } from 'src/shared/constants/suppliersUrl';
+import { BaseResponse } from 'src/shared/utils/base-response.utils';
+import { fetchAllProducts } from 'src/modules/product/integrations/fetch-all-products';
+import { GeneratePagination } from 'src/shared/utils/generate-pagination.utils';
+import { GetAllProductsParamsDto } from '../../dto/get-all-products-params.dto';
+import { FilterProductsInterface } from './utils/interfaces/filter-products.interface';
 
 @Injectable()
 export class GetAllProductsService {
+  constructor(
+    @Inject('FilterProductsInterface')
+    private readonly productFilter: FilterProductsInterface,
+  ) {}
   /**
    * Retorna uma lista de produtos paginada, com opção de ordenar e filtrar.
    *
@@ -19,60 +24,31 @@ export class GetAllProductsService {
    *
    * @returns Um objeto com as informações de paginação e dados paginados.
    */
-  async execute(
-    page = 1,
-    perPage = 30,
-    sort = null,
-    sortDir: SortDirection = 'asc',
-    filter?: string,
-    hasDiscount?: string | boolean,
-  ) {
-    // Busca produtos de fornecedores brasileiros e europeus
+  async execute(params: GetAllProductsParamsDto) {
     const [brazilianProducts, europeanProducts] = await Promise.all([
       fetchAllProducts(suppliers.brazilianSupplierUrl, 'brazilian'),
       fetchAllProducts(suppliers.europeanSupplierUrl, 'european'),
     ]);
 
-    // Combina todos os produtos em uma única lista
     const allProducts = [...brazilianProducts, ...europeanProducts];
 
-    // Converte o filtro de desconto para booleano, se necessário
-    const parsedHasDiscount =
-      typeof hasDiscount === 'string' ? hasDiscount === 'true' : hasDiscount;
+    // Filtrar os produtos de acordo com os parâmetros fornecidos
+    const filteredProducts = this.productFilter.filter(allProducts, params);
 
-    // Filtra produtos com base no texto e no desconto
-    const filteredProducts = allProducts.filter((product) => {
-      const matchesTextFilter = filter
-        ? (product.name &&
-            product.name.toLowerCase().includes(filter.toLowerCase())) ||
-          (product.description &&
-            product.description.toLowerCase().includes(filter.toLowerCase())) ||
-          (product.department &&
-            product.department.toLowerCase().includes(filter.toLowerCase())) ||
-          (product.category &&
-            product.category.toLowerCase().includes(filter.toLowerCase()))
-        : true;
-
-      const matchesDiscountFilter =
-        typeof parsedHasDiscount === 'boolean'
-          ? product.hasDiscount === parsedHasDiscount
-          : true;
-
-      return matchesTextFilter && matchesDiscountFilter;
-    });
-
-    // Pagina os produtos filtrados
+    // Gera a paginação
     const paginatedProducts = GeneratePagination(
       filteredProducts,
-      page,
-      perPage,
-      sort,
-      sortDir,
+      params.page ?? 1,
+      params.perPage ?? 30,
+      params.sort,
+      params.sortDir,
     );
 
-    // Retorna a resposta com os produtos paginados e metadados
     return BaseResponse.success<any>({
       statusCode: 200,
+      success: true,
+      errorType: null,
+      errors: null,
       message: 'Produtos encontrados com sucesso',
       data: paginatedProducts.data,
       meta: {
@@ -84,9 +60,9 @@ export class GetAllProductsService {
           prevPage: paginatedProducts.pagination.prevPage,
           nextPage: paginatedProducts.pagination.nextPage,
         },
-        sort,
-        sortDir,
-        filter: filter || null,
+        sort: params.sort,
+        sortDir: params.sortDir,
+        filter: params.filter || null,
       },
     });
   }
