@@ -9,6 +9,7 @@ import LoginPage from "@/pages/public-routes/login/login-page";
 import ProtectedRoute from "./protected-routes-layout";
 import SignupPage from "@/pages/public-routes/signup/signup-page";
 import AuthOnlyPublicRoute from "./auth-only-public-routes-layout";
+import MyOrdersPage from "@/pages/protected-routes/my-orders/my-orders-page";
 
 const routes = createBrowserRouter([
   {
@@ -34,7 +35,10 @@ const routes = createBrowserRouter([
       // Protegido: apenas logado
       {
         element: <ProtectedRoute />,
-        children: [{ path: "/checkout", element: <CheckoutPage /> }],
+        children: [
+          { path: "/checkout", element: <CheckoutPage /> },
+          { path: "/my-orders", element: <MyOrdersPage /> },
+        ],
       },
     ],
   },

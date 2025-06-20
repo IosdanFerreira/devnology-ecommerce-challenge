@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { PrismaService } from 'src/prisma/prisma.service';
+import { PrismaService } from 'src/modules/prisma/prisma.service';
 import { NotFoundError } from 'src/shared/errors';
 import { BaseResponse } from 'src/shared/utils/base-response.utils';
 import { PrismaPagination } from 'src/shared/utils/generate-prisma-pagination';

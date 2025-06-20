@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Get,
   Header,
   HttpCode,
   HttpStatus,
@@ -31,6 +32,8 @@ import { UserResponseDto } from './dto/user-response.dto';
 import { RefreshJwtAuthGuard } from 'src/shared/auth/guards/refresh-jwt-auth.guard';
 import { RefreshTokenService } from './services/refresh-token/refresh-token.service';
 import { LogoutService } from './services/logout/logout.service';
+import { JwtAuthGuard } from 'src/shared/auth/guards/jwt-auth.guard';
+import { GetLoggedUserService } from './services/get-logged-user/get-logged-user.service';
 
 @ApiTags('Autenticação')
 @Controller('auth')
@@ -40,6 +43,7 @@ export class AuthController {
     private readonly signupService: SignupService,
     private readonly refreshTokenService: RefreshTokenService,
     private readonly logoutService: LogoutService,
+    private readonly getLoggedUserService: GetLoggedUserService,
   ) {}
 
   @isPublic()
@@ -122,5 +126,25 @@ export class AuthController {
   @HttpCode(HttpStatus.OK)
   async logout(@Res({ passthrough: true }) res: Response) {
     return await this.logoutService.signout(res);
+  }
+
+  @Get('me')
+  @ApiOperation({
+    summary: 'Obter usuário logado',
+    description: 'Retorna os dados do usuário autenticado através do token JWT',
+  })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'Dados do usuário retornados com sucesso',
+  })
+  @ApiResponse({
+    status: HttpStatus.UNAUTHORIZED,
+    description: 'Acesso não autorizado - Token JWT inválido ou expirado',
+  })
+  @UseGuards(JwtAuthGuard)
+  async getLoggedUser(@Request() req: any) {
+    const user = req.user as { id: number };
+
+    return await this.getLoggedUserService.getMe(user.id);
   }
 }

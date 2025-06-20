@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 
 import type { IApiResponse } from "@/api/interface/api-response.interface";
 import type { IProduct } from "@/interfaces/product.interface";
-import { getAllProducts } from "@/api/modules/product/getAllProducts";
+import { getAllProducts } from "@/api/modules/product/get-all-products";
 
 import {
   Breadcrumb,
@@ -16,7 +16,7 @@ import {
 import ProductCard from "@/components/product-card";
 import { ProductCardSkeleton } from "@/components/product-card-skeleton";
 import { cn } from "@/lib/utils";
-import { FilterSidebar } from "./components/filter-sidebar";
+import { FilterSidebarWithResponsiveDrawer } from "./components/filter-sidebar-responsive";
 
 export default function SearchPage() {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -85,26 +85,36 @@ export default function SearchPage() {
   return (
     <main className="w-full flex px-3">
       {/* Sidebar de filtros */}
-      <aside className="p-4 border-r border-gray-300 sticky top-20">
+      <aside className="p-4 border-r border-gray-300 sticky top-20 hidden lg:block">
         <h2 className="text-xl font-semibold mb-4">Filtros</h2>
-        <FilterSidebar onApplyFilters={setFilters} {...filters} />
+        <FilterSidebarWithResponsiveDrawer
+          onApplyFilters={setFilters}
+          {...filters}
+        />
       </aside>
 
       {/* Conteúdo principal - Produtos */}
       <section className="flex-grow p-6">
-        <Breadcrumb className="my-6 text-sm text-muted-foreground">
-          <BreadcrumbList>
-            <BreadcrumbItem>
-              <BreadcrumbLink asChild>
-                <Link to="/">Home</Link>
-              </BreadcrumbLink>
-            </BreadcrumbItem>
-            <BreadcrumbSeparator />
-            <BreadcrumbItem>
-              <BreadcrumbLink>Busca</BreadcrumbLink>
-            </BreadcrumbItem>
-          </BreadcrumbList>
-        </Breadcrumb>
+        <div className="w-full flex items-center justify-between">
+          <Breadcrumb className="my-6 text-sm text-muted-foreground">
+            <BreadcrumbList>
+              <BreadcrumbItem>
+                <BreadcrumbLink asChild>
+                  <Link to="/">Home</Link>
+                </BreadcrumbLink>
+              </BreadcrumbItem>
+              <BreadcrumbSeparator />
+              <BreadcrumbItem>
+                <BreadcrumbLink>Busca</BreadcrumbLink>
+              </BreadcrumbItem>
+            </BreadcrumbList>
+          </Breadcrumb>
+
+          <FilterSidebarWithResponsiveDrawer
+            onApplyFilters={setFilters}
+            {...filters}
+          />
+        </div>
 
         <h2 className="text-md text-muted-foreground mb-5">
           Resultados encontrados para{" "}

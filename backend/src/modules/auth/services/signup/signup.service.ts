@@ -1,5 +1,5 @@
 import { HttpStatus, Inject, Injectable } from '@nestjs/common';
-import { PrismaService } from 'src/prisma/prisma.service';
+import { PrismaService } from 'src/modules/prisma/prisma.service';
 import { SignUpDto } from './dto/signup.dto';
 import { BaseResponseInterface } from 'src/shared/utils/interfaces/base-response.interface';
 import { UserEntity } from '../../entities/user.entity';

@@ -3,7 +3,7 @@ import { AuthController } from './auth.controller';
 import { LoginService } from './services/login/login.service';
 import { HashProvider } from 'src/shared/providers/hash-provider';
 import { JwtModule } from '@nestjs/jwt';
-import { PrismaService } from 'src/prisma/prisma.service';
+import { PrismaService } from 'src/modules/prisma/prisma.service';
 import { TokenService } from './services/token/tokens.service';
 import { SignupService } from './services/signup/signup.service';
 import jwtRefreshConfig from 'src/shared/auth/config/jwt-refresh.config';
@@ -13,6 +13,7 @@ import { JwtStrategy } from 'src/shared/auth/strategies/jwt.strategy';
 import { RefreshJwtStrategy } from 'src/shared/auth/strategies/jwt-refresh.strategy';
 import { RefreshTokenService } from './services/refresh-token/refresh-token.service';
 import { LogoutService } from './services/logout/logout.service';
+import { GetLoggedUserService } from './services/get-logged-user/get-logged-user.service';
 
 @Module({
   imports: [
@@ -30,6 +31,7 @@ import { LogoutService } from './services/logout/logout.service';
     TokenService,
     RefreshTokenService,
     LogoutService,
+    GetLoggedUserService,
     JwtStrategy,
     RefreshJwtStrategy,
     {

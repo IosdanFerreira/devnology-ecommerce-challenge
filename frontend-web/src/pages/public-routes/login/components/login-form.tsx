@@ -18,8 +18,10 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import InputPassword from "@/components/input-password";
 import { useAuth } from "@/context/auth-context";
+import { useNavigate } from "react-router-dom";
 
 function LoginForm() {
+  const navigate = useNavigate();
   const passwordRegex =
     /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^a-zA-Z0-9]).{8,}$/;
 
@@ -41,13 +43,14 @@ function LoginForm() {
     shouldUnregister: false,
   });
 
-  const { login, isLoading, errors } = useAuth();
+  const { login, isLoading, error } = useAuth();
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     login({
       email: values.email,
       password: values.password,
     });
+    navigate("/checkout");
   }
 
   return (
@@ -116,14 +119,14 @@ function LoginForm() {
             }}
           />
 
-          {errors && (
+          {error && (
             <Alert className="text-destructive border-destructive bg-destructive/10">
               <TriangleAlert />
               <AlertTitle className="font-bold">
                 Oops, algo deu errado!
               </AlertTitle>
               <AlertDescription className="text-destructive">
-                {errors?.map((error) => error.message)}
+                {error}
               </AlertDescription>
             </Alert>
           )}

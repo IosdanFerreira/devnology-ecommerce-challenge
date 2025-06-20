@@ -1,5 +1,5 @@
 import { Module } from '@nestjs/common';
-import { PrismaService } from './prisma/prisma.service';
+import { PrismaService } from './modules/prisma/prisma.service';
 import { ProductModule } from './modules/product/product.module';
 import { OrderModule } from './modules/order/order.module';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';

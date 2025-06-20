@@ -4,7 +4,7 @@ import Hero from "./components/hero";
 import { benefitsData } from "./data/benefits-data";
 import type { IApiResponse } from "@/api/interface/api-response.interface";
 import type { IProduct } from "@/interfaces/product.interface";
-import { getAllProducts } from "@/api/modules/product/getAllProducts";
+import { getAllProducts } from "@/api/modules/product/get-all-products";
 import ProductCard from "@/components/product-card";
 import { ProductCardSkeleton } from "@/components/product-card-skeleton";
 import type { IQueryParams } from "@/api/interface/query-params";

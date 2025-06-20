@@ -12,7 +12,6 @@ import { useNavigate } from "react-router-dom";
 import { AxiosError } from "axios";
 import type { User } from "@/interfaces/user.interface";
 import type { IApiResponse } from "@/api/interface/api-response.interface";
-import type { IApiErrors } from "@/api/interface/api-errors.interface";
 
 /**
  * Interface representing the API error response structure
@@ -35,7 +34,7 @@ interface AuthContextType {
   /** Function to manually update user state */
   setUser: (user: User | null) => void;
   /** Authentication errors if any */
-  errors: IApiErrors[] | null;
+  error: string | null;
 }
 
 /**
@@ -49,19 +48,17 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [errors, setErrors] = useState<IApiErrors[] | null>(null);
+  const [error, setErrors] = useState<string | null>("");
   const navigate = useNavigate();
 
   // Fetch user data on initial load
   useEffect(() => {
     const fetchUser = async () => {
       try {
-        const { data } = await api.get("/user/me");
+        const { data } = await api.get("/auth/me");
         setUser(data.data);
-        setIsLoading(false);
       } catch {
         setUser(null);
-        setIsLoading(false);
       } finally {
         setIsLoading(false);
       }
@@ -78,11 +75,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     try {
       const { data } = await api.post("/auth/login", credentials);
       setUser(data.data);
-      setErrors(null);
-      navigate("/dashboard", { replace: true });
     } catch (err) {
       const error = err as AxiosError<IApiResponse<null>>;
-      const responseErrors = error.response?.data?.errors || null;
+      const responseErrors = error.response?.data?.message || null;
       setErrors(responseErrors);
       setIsLoading(false);
     }
@@ -96,7 +91,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     await api.post("/auth/logout");
     setUser(null);
     setErrors(null);
-    navigate("/login", { replace: true });
+    navigate("/", { replace: true });
     window.location.reload();
   };
 
@@ -111,7 +106,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         login,
         logout,
         setUser,
-        errors,
+        error,
       }}
     >
       {children}

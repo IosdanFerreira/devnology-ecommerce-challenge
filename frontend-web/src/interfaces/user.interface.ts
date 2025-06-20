@@ -2,8 +2,7 @@ import type { Role } from "./role.interface";
 
 export interface User {
   id: number;
-  first_name: string;
-  last_name: string;
+  name: string;
   email: string;
   phone: string;
   privacy_consent: boolean;

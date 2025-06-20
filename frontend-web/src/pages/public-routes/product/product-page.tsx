@@ -1,6 +1,6 @@
 import { Link, useParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
-import { getProductById } from "@/api/modules/product/getProductById";
+import { getProductById } from "@/api/modules/product/get-product-by-id";
 import { convertToReal } from "@/utils/convert-to-real";
 import { Button } from "@/components/ui/button";
 import { useCartStore } from "@/store/cart-store";
@@ -14,13 +14,14 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useState } from "react";
 import { ProductPageSkeleton } from "./components/product-page-skeleton";
-import { getAllProducts } from "@/api/modules/product/getAllProducts";
+import { getAllProducts } from "@/api/modules/product/get-all-products";
 import ProductCard from "@/components/product-card";
 import { useFavoritesStore } from "@/store/favorites-store";
 import { Heart } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import ProductGallery from "./components/product-galery";
 import { cn } from "@/lib/utils";
+import { toast } from "sonner";
 
 export default function ProductPage() {
   const { id } = useParams<{ id: string }>();
@@ -64,7 +65,7 @@ export default function ProductPage() {
   }
 
   return (
-    <main className="w-full flex flex-col items-center px-3">
+    <main className="w-full flex flex-col items-center px-3 bg-[#F9F9F9]">
       <div className="container">
         {/* Breadcrumb */}
         <Breadcrumb className="my-6 text-sm text-muted-foreground">
@@ -171,21 +172,20 @@ export default function ProductPage() {
                   className={cn(
                     "bg-[#202020] w-10/12 md:w-fit cursor-pointer py-6 text-[16px] font-semibold"
                   )}
-                  onClick={() =>
-                    addToCart({ product: product!, quantity: productQuantity })
-                  }
+                  onClick={() => {
+                    addToCart({ product: product!, quantity: productQuantity });
+                    toast("Produto adicionado ao carrinho", {
+                      style: {
+                        background: "#009966",
+                        color: "#fff",
+                        fontSize: "15px",
+                      },
+                    });
+                  }}
                 >
                   Adicionar ao carrinho
                 </Button>
               </div>
-              <Button
-                className="bg-emerald-700 hover:bg-emerald-600 cursor-pointer py-6 w-full md:w-fit text-[16px] font-semibold"
-                onClick={() =>
-                  addToCart({ product: product!, quantity: productQuantity })
-                }
-              >
-                Comprar agora
-              </Button>
             </div>
           </div>
         </div>
@@ -194,8 +194,12 @@ export default function ProductPage() {
         <div className=" mb-12">
           <Tabs defaultValue="description" className="w-full">
             <TabsList className="mb-6">
-              <TabsTrigger value="description">Descrição</TabsTrigger>
-              <TabsTrigger value="reviews">Avaliações</TabsTrigger>
+              <TabsTrigger value="description" className="cursor-pointer">
+                Descrição
+              </TabsTrigger>
+              <TabsTrigger value="reviews" className="cursor-pointer">
+                Avaliações
+              </TabsTrigger>
             </TabsList>
 
             <TabsContent value="description">

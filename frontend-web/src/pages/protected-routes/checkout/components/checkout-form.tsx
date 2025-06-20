@@ -21,6 +21,8 @@ import {
   SelectItem,
   SelectValue,
 } from "@/components/ui/select";
+import { useMutation } from "@tanstack/react-query";
+import { createOrder } from "@/api/modules/order/create-order";
 
 const checkoutSchema = z.object({
   customer: z.string().min(2, "Nome é obrigatório"),
@@ -47,7 +49,7 @@ export function CheckoutForm() {
   const navigate = useNavigate();
   const {
     getTotalPrice: geCartTotalPrice,
-    items: products,
+    items: productsItems,
     clearCart,
   } = useCartStore();
 
@@ -70,7 +72,20 @@ export function CheckoutForm() {
 
   const paymentMethod = form.watch("paymentMethod");
 
-  const handleSubmit: SubmitHandler<CheckoutSchema> = (data) => {
+  const { mutate: submitOrder } = useMutation({
+    mutationFn: createOrder,
+    onSuccess: () => {
+      clearCart();
+      navigate("/my-orders");
+      console.log("Passou");
+    },
+    onError: (err) => {
+      console.log("Erro ao finalizar pedido:", err);
+      // você pode exibir um toast ou mensagem de erro aqui
+    },
+  });
+
+  const submit: SubmitHandler<CheckoutSchema> = async (data) => {
     const formattedAddressValue = `${data.street}, ${data.number}, ${data.complement}, ${data.neighborhood}, ${data.city}, ${data.state}`;
 
     const formattedInput = {
@@ -78,21 +93,19 @@ export function CheckoutForm() {
       email: data.email,
       phone: data.phone,
       address: formattedAddressValue,
-      products: products,
+      products: productsItems,
       totalAmount: geCartTotalPrice(),
       paymentMethod: data.paymentMethod,
       paymentId: uuidv4(),
     };
 
-    console.log("Pedido:", formattedInput);
-    // clearCart();
-    // navigate("/checkout/success");
+    submitOrder(formattedInput);
   };
 
   return (
     <FormProvider {...form}>
       <form
-        onSubmit={form.handleSubmit(handleSubmit)}
+        onSubmit={form.handleSubmit(submit)}
         className={cn(
           "w-full lg:w-[25vw] space-y-5 border border-[#e6e6e6] rounded-md p-6 lg:mx-15 bg-white"
         )}

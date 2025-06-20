@@ -1,5 +1,5 @@
 import { HttpStatus, Inject, Injectable, Res } from '@nestjs/common';
-import { PrismaService } from 'src/prisma/prisma.service';
+import { PrismaService } from 'src/modules/prisma/prisma.service';
 import { SignInDto } from './dto/signin.dto';
 import { UserEntity } from '../../entities/user.entity';
 import { BadRequestError } from 'src/shared/errors';
