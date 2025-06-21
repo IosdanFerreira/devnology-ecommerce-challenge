@@ -102,6 +102,7 @@ docker compose build
 docker compose build --no-cache
 
 # suba o container
+# (Pode demorar um pouco, pois irá instalar todas as dependencias)
  docker compose up -d
 ```
 
