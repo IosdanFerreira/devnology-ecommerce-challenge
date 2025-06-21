@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import {
   Form,
   FormControl,
@@ -11,13 +12,21 @@ import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import InputPassword from "@/components/input-password";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useMutation } from "@tanstack/react-query";
+import { Signup, type SignupDTO } from "@/api/modules/user/signup";
+import { toast } from "sonner";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { TriangleAlert } from "lucide-react";
+import { useAuth } from "@/context/auth-context";
 
 export function RegisterForm() {
+  const navigate = useNavigate();
+  const { login } = useAuth();
   const passwordRegex =
     /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^a-zA-Z0-9]).{8,}$/;
 
@@ -36,11 +45,10 @@ export function RegisterForm() {
       privacy_consent: z.boolean().refine((val) => val === true, {
         message: "Você precisa aceitar os termos de privacidade.",
       }),
-      role_id: z.number(),
     })
     .refine((data) => data.password === data.confirm_password, {
       message: "As senhas devem ser iguais",
-      path: ["confirmPassword"],
+      path: ["confirm_password"],
     });
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -51,19 +59,34 @@ export function RegisterForm() {
       password: "",
       confirm_password: "",
       privacy_consent: false,
-      role_id: 2,
     },
     shouldUnregister: false,
   });
 
+  const signupMutate = useMutation({
+    mutationFn: (data: SignupDTO) => Signup(data),
+    onSuccess: () => {
+      // ex: navegação após sucesso
+      toast.success("Cadastro realizado!");
+      login({
+        email: form.getValues("email"),
+        password: form.getValues("password"),
+      });
+      navigate("/");
+    },
+    onError: (error: any) => {
+      toast.error(error?.response?.data?.message);
+    },
+  });
+
   async function onSubmit(values: z.infer<typeof formSchema>) {
-    try {
-      // Aqui você deve implementar a chamada para a API de registro
-      console.log(values);
-    } catch {
-      // Não resetar o formulário em caso de erro
-      return;
-    }
+    signupMutate.mutate({
+      name: values.name,
+      email: values.email,
+      phone: "(11) 99999-9999",
+      password: values.confirm_password,
+      privacy_consent: values.privacy_consent,
+    });
   }
 
   return (
@@ -227,11 +250,25 @@ export function RegisterForm() {
             }}
           />
 
+          {signupMutate?.error && (
+            <Alert className="text-destructive border-destructive bg-destructive/10">
+              <TriangleAlert />
+              <AlertTitle className="font-bold">
+                Oops, algo deu errado!
+              </AlertTitle>
+              <AlertDescription className="text-destructive">
+                {signupMutate?.error?.response?.data?.errors?.map(
+                  (error: any) => error.message
+                )}
+              </AlertDescription>
+            </Alert>
+          )}
+
           <Button
             type="submit"
             className="w-full cursor-pointer text-md py-6 text-xl"
           >
-            Entrar
+            Realizar cadastro
           </Button>
         </form>
       </Form>

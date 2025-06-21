@@ -12,9 +12,6 @@ export class SignUpDto {
   @ApiProperty()
   @IsNotEmpty({ message: 'Nome é obrigatório' })
   @IsString({ message: 'name deve ser do tipo string' })
-  @Matches(/^[A-ZÀ-Ÿ][A-Za-zÀ-ÿ']+( [A-Za-zÀ-ÿ']+)*$/, {
-    message: 'Nome deve conter pelo menos 3 caracteres',
-  })
   name: string;
 
   @ApiProperty()
